@@ -8,6 +8,7 @@ var AppError = require('../app-error');
 var config    = require('../config');
 var log4js = require('log4js');
 var log = log4js.getLogger("cps:ClientManager");
+log.level = 'debug';
 var Sequelize = require('sequelize');
 
 var proto = module.exports = function (){

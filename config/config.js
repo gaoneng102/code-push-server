@@ -5,7 +5,7 @@ config.development = {
   // Config for database, only support mysql.
   db: {
     username: process.env.RDS_USERNAME || "root",
-    password: process.env.RDS_PASSWORD || null,
+    password: process.env.RDS_PASSWORD || "123456",
     database: process.env.DATA_BASE || "codepush",
     host: process.env.RDS_HOST || "127.0.0.1",
     port: process.env.RDS_PORT || 3306,
@@ -57,16 +57,16 @@ config.development = {
   // Config for local storage when storageType value is "local".
   local: {
     // Binary files storage dir, Do not use tmpdir and it's public download dir.
-    storageDir: process.env.STORAGE_DIR || "/Users/tablee/workspaces/storage",
+    storageDir: process.env.STORAGE_DIR || "/Users/mike/Work/storage",
     // Binary files download host address which Code Push Server listen to. the files storage in storageDir.
-    downloadUrl: process.env.LOCAL_DOWNLOAD_URL || "http://127.0.0.1:3000/download",
+    downloadUrl: process.env.LOCAL_DOWNLOAD_URL || "http://localhost:3000/download",
     // public static download spacename.
     public: '/download'
   },
   jwt: {
     // Recommended: 63 random alpha-numeric characters
     // Generate using: https://www.grc.com/passwords.htm
-    tokenSecret: process.env.TOKEN_SECRET ||'INSERT_RANDOM_TOKEN_KEY'
+    tokenSecret: process.env.TOKEN_SECRET ||'A142DD8962FE5ED55442DC4EEF79056A5FA61C465A8B5D174F2420AD102E9B92'
   },
   common: {
     /*
@@ -101,7 +101,7 @@ config.development = {
   // Config for redis (register module, tryLoginTimes module)
   redis: {
     default: {
-      host: "127.0.0.1",
+      host: "localhost",
       port: 6379,
       retry_strategy: function (options) {
         if (options.error.code === 'ECONNREFUSED') {

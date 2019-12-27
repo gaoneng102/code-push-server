@@ -17,18 +17,20 @@ proto.findAppByName = function (uid, appName) {
   return models.Apps.findOne({where: {name: appName, uid: uid}});
 };
 
-proto.addApp = function (uid, appName, os, platform, identical) {
+proto.addApp = function (uid, appName, os, platform, identical, isUseDiffText) {
   return models.sequelize.transaction((t) => {
+    var constName = require('../const');
+    var is_use_diff_text = isUseDiffText ? constName.IS_USE_DIFF_TEXT_YES : constName.IS_USE_DIFF_TEXT_NO;
     return models.Apps.create({
       name: appName,
       uid: uid,
       os: os,
-      platform: platform
+      platform: platform,
+      is_use_diff_text: is_use_diff_text,
     },{
       transaction: t
     })
     .then((apps) => {
-      var constName = require('../const');
       var appId = apps.id;
       var deployments = [];
       var deploymentKey = security.randToken(28) + identical;

@@ -6,12 +6,15 @@ var models = require('../models');
 var middleware = require('../core/middleware');
 var AccountManager = require('../core/services/account-manager');
 var AppError = require('../core/app-error')
+const logger = require('log4js').getLogger("users");
+logger.level = 'debug';
 
 router.get('/', middleware.checkToken, (req, res) => {
   res.send({ title: 'CodePushServer' });
 });
 
 router.post('/', (req, res, next) => {
+  logger.debug(req.body);
   var email = _.trim(_.get(req, 'body.email'));
   var token = _.trim(_.get(req, 'body.token'));
   var password = _.trim(_.get(req, 'body.password'));
@@ -57,8 +60,9 @@ router.post('/registerCode', (req, res, next) => {
   var email = _.get(req, 'body.email');
   var accountManager = new AccountManager();
   return accountManager.sendRegisterCode(email)
-  .then(() => {
-    res.send({status: "OK"});
+  .then((token) => {
+    // 由于内网服务器无法发送短信，这里直接将token返回
+    res.send({status: "OK", token});
   })
   .catch((e) => {
     if (e instanceof AppError.AppError) {

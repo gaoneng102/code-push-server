@@ -15,6 +15,7 @@ var AppError = require('../app-error');
 var constConfig = require('../const');
 var log4js = require('log4js');
 var log = log4js.getLogger("cps:PackageManager");
+log.level = 'debug';
 
 var proto = module.exports = function (){
   function PackageManager() {
@@ -55,6 +56,7 @@ proto.parseReqFile = function (req) {
         reject(new AppError.AppError("upload error"));
       } else {
         log.debug('parseReqFile fields:', fields);
+        log.debug('parseReqFile files:', files);
         log.debug('parseReqFile file location:', _.get(files,'package.path'));
         if (_.isEmpty(fields.packageInfo) || _.isEmpty(_.get(files,'package'))) {
           log.debug('parseReqFile upload info lack');

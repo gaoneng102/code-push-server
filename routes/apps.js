@@ -1,5 +1,7 @@
 var express = require('express');
 var Promise = require('bluebird');
+const request = require('request');
+
 var router = express.Router();
 var _ = require('lodash');
 var middleware = require('../core/middleware');
@@ -17,6 +19,7 @@ const REGEX_ANDROID = /^(\w+)(-android)$/;
 const REGEX_IOS = /^(\w+)(-ios)$/;
 var log4js = require('log4js');
 var log = log4js.getLogger("cps:apps");
+log.level = 'debug';
 
 router.get('/', middleware.checkToken, (req, res, next) => {
   var uid = req.users.id;
@@ -640,6 +643,30 @@ router.patch('/:appName',
   }
 });
 
+router.patch('/:appName/usedifftext',
+  middleware.checkToken, (req, res, next) => {
+  var appName = _.trim(req.params.appName);
+  var constName = require('../core/const');
+  var isUseDiffText = req.body.isUseDiffText === true ? true : false;
+  isUseDiffText = isUseDiffText ? constName.IS_USE_DIFF_TEXT_YES : constName.IS_USE_DIFF_TEXT_NO;
+  var uid = req.users.id;
+  var appManager = new AppManager();
+  return accountManager.ownerCan(uid, appName)
+  .then((col) => {
+    return appManager.modifyApp(col.appid, {is_use_diff_text: isUseDiffText});
+  })
+  .then(() => {
+    res.send("ok");
+  })
+  .catch((e) => {
+    if (e instanceof AppError.AppError) {
+      res.status(406).send(e.message);
+    } else {
+      next(e);
+    }
+  });
+});
+
 router.post('/:appName/transfer/:email',
   middleware.checkToken, (req, res, next) => {
   var appName = _.trim(req.params.appName);
@@ -699,6 +726,7 @@ router.post('/', middleware.checkToken, (req, res, next) => {
     return res.status(406).send("Please input platform [React-Native|Cordova]!");
   }
   var manuallyProvisionDeployments = req.body.manuallyProvisionDeployments;
+  var isUseDiffText = req.body.isUseDiffText === true ? true : false;
   var uid = req.users.id;
   var appManager = new AppManager();
 
@@ -707,7 +735,7 @@ router.post('/', middleware.checkToken, (req, res, next) => {
     if (!_.isEmpty(appInfo)){
       throw new AppError.AppError(appName + " Exist!");
     }
-    return appManager.addApp(uid, appName, os, platform, req.users.identical)
+    return appManager.addApp(uid, appName, os, platform, req.users.identical, isUseDiffText)
     .then(() => {
       return {name: appName, collaborators: {[req.users.email]: {permission: "Owner"}}};
     });

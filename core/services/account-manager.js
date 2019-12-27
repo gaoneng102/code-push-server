@@ -11,6 +11,7 @@ var config = require('../config');
 var AppError = require('../app-error');
 var log4js = require('log4js');
 var log = log4js.getLogger("cps:AccountManager");
+log.level = 'debug';
 
 var proto = module.exports = function (){
   function AccountManager() {
@@ -177,6 +178,7 @@ proto.sendRegisterCode = function (email) {
   .then(() => {
     //将token临时存储到redis
     var token = security.randToken(40);
+    log.debug('randToken', token);
     var client = factory.getRedisClient("default");
     return client.setexAsync(`${REGISTER_CODE}${security.md5(email)}`, EXPIRED, token)
     .then(() => {
@@ -185,9 +187,11 @@ proto.sendRegisterCode = function (email) {
     .finally(() => client.quit());
   })
   .then((token) => {
-    //将token发送到用户邮箱
-    var emailManager = new EmailManager();
-    return emailManager.sendRegisterCode(email, token);
+    // 将token发送到用户邮箱
+    // var emailManager = new EmailManager();
+    // return emailManager.sendRegisterCode(email, token);
+    log.debug('token', token);
+    return token;
   })
 };
 

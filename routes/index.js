@@ -7,6 +7,7 @@ var ClientManager = require('../core/services/client-manager');
 var _ = require('lodash');
 var log4js = require('log4js');
 var log = log4js.getLogger("cps:index");
+log.level = 'debug';
 
 router.get('/', (req, res, next) => {
   res.render('index', { title: 'CodePushServer' });

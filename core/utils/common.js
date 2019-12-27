@@ -14,6 +14,8 @@ var jschardet = require("jschardet");
 var log4js = require('log4js');
 var path = require('path');
 var log = log4js.getLogger("cps:utils:common");
+log.level = 'debug';
+
 module.exports = common;
 
 common.detectIsTextFile = function(filePath) {
@@ -94,6 +96,7 @@ common.createFileFromRequest = function (url, filePath) {
           reject(error);
         })
         .on('response', function (response) {
+          log.debug(`createFileFromRequest response:${JSON.stringify(response, null, 2)}`)
           if (response.statusCode == 200) {
             let stream = fs.createWriteStream(filePath);
             response.pipe(stream);
@@ -298,7 +301,7 @@ common.getBlobDownloadUrl = function (blobUrl) {
   if ( storageType === 'local') {
     fileName = blobUrl.substr(0, 2).toLowerCase() + '/' + blobUrl;
   }
-  if (!validator.isURL(downloadUrl)) {
+  if (!validator.isURL(downloadUrl,{require_tld: false})) {
     var e = new AppError.AppError(`Please config ${storageType}.downloadUrl in config.js`);
     log.error(e);
     throw e;
